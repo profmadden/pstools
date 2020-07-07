@@ -1,10 +1,17 @@
 # pstools
 A simple C wrapper library, for generating PostScript files.
 
-PostScript is a handy language for creating graphics, text, and whatnot.
+[PostScript](https://www.adobe.com/content/dam/acom/en/devnet/actionscript/articles/PLRM.pdf)
+is a handy language for creating graphics, text, and whatnot.
 Really, some first-rate magic from the good folks at Adobe.  This
 library is designed to make creating PostScript files from C programs
 a little less cryptic, and a little less painful.
+
+For writing raw PostScript, here's some good references:
+* [PostScript Tutorial by Paul Bourke](http://paulbourke.net/dataformats/postscript/) - short, and gets right to the point.
+* [Getting started in PostScript](https://www.math.ubc.ca/~cass/graphics/text/www/pdf/ch1.pdf) - more complex stuff
+* [PostScript Tutorial and Cookbook](https://www-cdf.fnal.gov/offline/PostScript/BLUEBOOK.PDF) - the big guide
+
 
 Open a file, and call **ps_init** to generate the boilerplate
 PostScript, that should be at the front of a file.  This will create
