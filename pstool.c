@@ -46,6 +46,7 @@ int ps_setfont(FILE *fp, char *name, float fontsize)
     fprintf(fp, "/%s findfont %f scalefont setfont\n", name, fontsize);
     return 0;
 }
+
 int ps_line(FILE *fp, float x1, float y1, float x2, float y2)
 {
     fprintf(fp, "newpath %f %f moveto %f %f lineto stroke\n",
@@ -120,6 +121,100 @@ int ps_graphpoints(FILE *fp, int nv, float *x, float *y, float *z, int ne, int *
         ps_circle(fp, x[v], y[v], 10, 1, 1);
     }
     
+    return 0;
+}
+
+struct graphexample
+{
+    float originx;
+    float originy;
+    float width;
+    float height;
+    float intervalx; //intervals are how far to space gridlines/ticks on each axis
+    float intervaly;
+};
+
+//values of min and max x and y's -- helpful for determining scale on graph for grid lines and plotting points accurately 6 
+struct graphminsmaxs
+{
+    float min_x;
+    float max_x;
+    float min_y;
+    float max_y;
+};
+
+int ps_graph_box(FILE *fp, struct graphexample graph, struct graphminsmaxs values)
+{
+    
+    float scalex = graph.width / values.max_x;
+    float scaley = graph.height / values.max_y;
+    
+    ps_line(fp, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
+    ps_line(fp, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
+    
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
+    
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
+    
+    //draws vertical tick lines
+    for (int i = graph.originx; i <= graph.originx + graph.width; i += (graph.intervalx * scalex))
+    {
+        ps_line(fp, i, graph.originy - 2, i, graph.originy);
+    }
+    
+    //draws horizontal tick lines
+    for (int i = graph.originy; i <= graph.originy + graph.height; i += (graph.intervaly * scaley))
+    {
+        ps_line(fp, graph.originx - 2, i, graph.originx, i);
+    }
+    
+    return 0;
+}
+
+int ps_graph_box_grid(FILE *fp, struct graphexample graph, struct graphminsmaxs values)
+{
+    
+    float scalex = graph.width / values.max_x;
+    float scaley = graph.height / values.max_y;
+    
+    ps_line(fp, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
+    ps_line(fp, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
+    
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
+    
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
+    fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
+    
+    //draws vertical grid lines
+    for (int i = graph.originx; i <= graph.originx + graph.width; i += (graph.intervalx * scalex))
+    {
+        ps_line(fp, i, graph.originy - 2, i, graph.originy + graph.height);
+    }
+    
+    //draws horizontal grid lines
+    for (int i = graph.originy; i <= graph.originy + graph.height; i += (graph.intervaly * scaley))
+    {
+        ps_line(fp, graph.originx - 2, i, graph.originx + graph.width, i);
+    }
+    
+    return 0;
+}
+
+int ps_graph_line(FILE *fp, struct graphexample graph, int num_values, float *x, float *y, struct graphminsmaxs values)
+{
+    float scalex = graph.width / values.max_x;
+    float scaley = graph.height / values.max_y;
+    for (int i = 0; i < num_values ; i++)
+    {
+        ps_circle(fp, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), 2, 1, 1);
+        if (i < num_values - 1){
+            ps_line(fp, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), graph.originx + (x[i + 1] * scalex), graph.originy + (y[i + 1] * scaley));
+        }
+    }
+
     return 0;
 }
 
