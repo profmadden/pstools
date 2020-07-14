@@ -10,6 +10,21 @@
 #define pstool_h
 
 #include <stdio.h>
+
+typedef struct
+{
+  FILE *fp;
+  // Entire drawing region for the PostScript file
+  float origin_x, origin_y, width, height;
+} ps_context;
+
+typedef struct
+{
+  float min_x, min_y, max_x, max_y;
+  float interval_x, interval_y;
+} ps_frame;
+
+
 int ps_init(FILE *fp, float originx, float originy, float width, float height);
 int ps_setlinewidth(FILE *fp, float width);
 int ps_setcolor(FILE *fp, float r, float g, float b);
