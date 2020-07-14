@@ -31,7 +31,7 @@ int ps_graph_line(FILE *fp, struct graphexample graph, int num_values, float *x,
 
 int main(int argc, char *argv[])
 {
-    FILE *fp = fopen("graphexample.ps", "w");
+    FILE *fp = fopen("example03.ps", "w");
     
     ps_init(fp, 0, 0, 1000, 1000);
     // ps_graphpoints(fp, 5, x, y, z, 5, v0, v1, 0.0);

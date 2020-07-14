@@ -1,4 +1,4 @@
-demos:  example01.pdf example02.pdf
+demos:  example01.pdf example02.pdf example03.pdf
 
 example01.pdf: example01
 	./example01
