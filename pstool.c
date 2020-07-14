@@ -1,6 +1,6 @@
 //
 //  pstool.c
-//  FengShuiXX
+//  Simple library wrapper to generate PostScript files.
 //
 //  Created by Patrick Madden on 5/17/20.
 //  Copyright © 2020 Binghamton Optimality Research Group. All rights reserved.
