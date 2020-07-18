@@ -7,9 +7,12 @@
 //
 
 #include <math.h>
+#include <string.h>
 #include "pstool.h"
 
 #define pi 3.14159265358979323846
+
+float ps_fontsize;
 
 int ps_init(FILE* fp, float originx, float originy, float width, float height)
 {
@@ -22,6 +25,7 @@ int ps_init(FILE* fp, float originx, float originy, float width, float height)
 	fprintf(fp, "%%%%Page: 1 1                           \n");
 
 	fprintf(fp, "/Courier findfont 15 scalefont setfont\n");
+	ps_fontsize = 15;
 
 	return 0;
 }
@@ -47,6 +51,7 @@ int ps_setfont(FILE* fp, char* name, float fontsize)
 		name = "Courier";
 
 	fprintf(fp, "/%s findfont %f scalefont setfont\n", name, fontsize);
+	ps_fontsize = fontsize;
 	return 0;
 }
 
@@ -240,8 +245,51 @@ int ps_pie_chart(FILE* fp, float originx, float originy, float width, float heig
 		angle += pi * (values[i] + (i > 0 ? values[i - 1] : 0.0F));
 		targetx = originx + cos(angle) * radius;
 		targety = originy + sin(angle) * radius;
-		ps_text(fp, (targetx * 2 + originx) / 3, (targety * 2 + originy) / 3, labels[i]);
+		ps_text(fp, 
+			(targetx * 2 + originx) / 3 - ((ps_fontsize/3) * strlen(labels[i])),
+			(targety * 2 + originy) / 3 - (ps_fontsize / 3),
+			labels[i]);
 	}
+	return 0;
+}
+
+
+int ps_histogram(FILE* fp, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float* bar_heights)
+{
+	ps_line(fp, originx,originy, originx + width,originy); //initial lines and labels
+	ps_line(fp, originx,originy,originx, originy + height);
+	ps_text(fp, originx + width, originy, x_label);
+	ps_text(fp, originx, originy+height, y_label);
+
+	int i;
+	float value_scale = (x_scale.max - x_scale.min) / x_scale.count;
+	float scale = width / x_scale.count;
+	char label_buffer_x[x_scale.precision+1];
+
+	for (i = 0; i < y_scale.count+1; i++) //x axis values
+	{
+		snprintf(label_buffer_x, sizeof(label_buffer_x), "%f", x_scale.min + value_scale * i);
+		ps_text(fp, originx + scale * i, originy - ps_fontsize , label_buffer_x);
+		if (i < y_scale.count)
+			ps_box(fp,
+				originx + (scale * i),
+				originy,
+				originx + (scale * (i+1)),
+				originy+height*((bar_heights[i]-y_scale.min)/(y_scale.max-y_scale.min)),
+				1,
+				i%2);
+	}
+
+	value_scale = (y_scale.max - y_scale.min) / y_scale.count;
+	scale = height / y_scale.count;
+	char label_buffer_y[y_scale.precision + 1];
+
+	for (i = 0; i < y_scale.count+1; i++) //y axis values
+	{
+		snprintf(label_buffer_y, sizeof(label_buffer_y), "%f", y_scale.min + value_scale * i);
+		ps_text(fp, originx - (ps_fontsize * (((float)sizeof(label_buffer_y))/2)) , originy + scale * i,  label_buffer_y);
+	}
+
 	return 0;
 }
 
