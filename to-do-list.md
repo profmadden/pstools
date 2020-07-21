@@ -52,6 +52,11 @@ ps_3d_object *list;
 
 We create a "3d space" structure, and add items to it as a linked list.  Then, we call 3d_render, and it sorts the list from the back, and renders (creates the PostScript draw operation) in serial form.
 
-int ps_3d_render(ps_3d_space *the3d_space);
+ps_set_color(int color_number, float r, float g, float b);
+ps_set_pattern(int color_number, ....);
+
+int ps_3d_add_object(3d_space, x1, y1, z1, x2, y2, z2, int color, int fill, int stroke);
+int ps_3d_setcamera(something);
+int ps_3d_render(FILE *fp, ps_3d_space *the3d_space);
 
 
