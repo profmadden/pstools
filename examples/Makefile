@@ -1,4 +1,4 @@
-demos:  example01.pdf example02.pdf example03.pdf
+demos:  example01.pdf example02.pdf example03.pdf example04.pdf
 
 example01.pdf: example01
 	./example01
@@ -7,12 +7,12 @@ example01.pdf: example01
 example01: example01.c ../pstool.c
 	cc example01.c ../pstool.c -o example01 -lm
 
-piechartexample.pdf: piechartexample
-	./piechartexample
-	gs -o piechartexample.pdf -sDEVICE=pdfwrite -dEPSCrop piechartexample.ps
+example04.pdf: example04
+	./example04
+	gs -o example04.pdf -sDEVICE=pdfwrite -dEPSCrop example04.ps
 
-piechartexample: piechartexample.c ../pstool.c
-	cc piechartexample.c ../pstool.c -o piechartexample -lm
+example04: example04.c ../pstool.c
+	cc example04.c ../pstool.c -o example04 -lm
 
 
 example02.pdf: example02
