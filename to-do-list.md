@@ -30,3 +30,28 @@ ps_pie_chart(FILE *fp, float originx, float originy, float width, float height,
 int num_values, float *values, char **labels);
 ```
 
+### 3D?
+
+To handle 3d, will need to order the objects by the Z axis, and then render them one at a time, from "back" to "front".
+
+Possibly something like
+
+struct
+{
+float x1, y1, z1, x2, y2, z2;
+int color_id;  // What color to draw
+int stroke; // Should we stroke the outline
+int fill;  // Color fill the rectangle?
+struct ps_3d_object * next;
+} ps_3d_object;
+
+struct
+{
+ps_3d_object *list;
+} ps_3d_space;
+
+We create a "3d space" structure, and add items to it as a linked list.  Then, we call 3d_render, and it sorts the list from the back, and renders (creates the PostScript draw operation) in serial form.
+
+int ps_3d_render(ps_3d_space *the3d_space);
+
+
