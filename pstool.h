@@ -70,5 +70,6 @@ ps_3d_color ps_3d_new_color(float r, float g, float b);
 int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4], ps_3d_color color);
 int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
 int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
+int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos);
 
 #endif /* pstool_h */
