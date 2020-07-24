@@ -266,11 +266,11 @@ int ps_histogram(FILE* fp, float originx, float originy, float width, float heig
 	float scale = width / x_scale.count;
 	char label_buffer_x[x_scale.precision+1];
 
-	for (i = 0; i < y_scale.count+1; i++) //x axis values
+	for (i = 0; i < x_scale.count+1; i++) //x axis values
 	{
 		snprintf(label_buffer_x, sizeof(label_buffer_x), "%f", x_scale.min + value_scale * i);
 		ps_text(fp, originx + scale * i, originy - ps_fontsize , label_buffer_x);
-		if (i < y_scale.count)
+		if (i < x_scale.count)
 			ps_box(fp,
 				originx + (scale * i),
 				originy,

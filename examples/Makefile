@@ -34,4 +34,11 @@ example05.pdf: example05
 
 example05: example05.c ../pstool.c
 	cc example05.c ../pstool.c ../pstools3d.c -o example05 -lm
+	
+example_syscall.pdf: example_syscall
+	./example_syscall
+	gs -o example_syscall.pdf -sDEVICE=pdfwrite -dEPSCrop example_syscall.ps
+
+example_syscall: example_syscall.c ../pstool.c
+	cc example_syscall.c ../pstool.c ../pstools3d.c -o example_syscall -lm
 
