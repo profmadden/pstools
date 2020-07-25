@@ -7,7 +7,7 @@ static ps_3d_perspective perspective;
 static ps_3d_vector camera; //for single camera view only
 static ps_3d_vector euler_angles; 
 
-static ps_3d_obj* queue= (ps_3d_obj  *) 0x0;
+static ps_3d_obj* queue = (ps_3d_obj*)0x0;
 static int queue_length = 0;
 
 //vector operations
@@ -57,7 +57,7 @@ int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_c
 //draw operations
 
 
-int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color color)
+static int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color color)
 {
 	ps_setcolor(fp, color->r, color->g, color->b);
 	ps_3d_vector temp, projections[4];
@@ -65,14 +65,14 @@ int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color color)
 
 	for (i = 0; i < 4; i++)
 	{
-		if (perspective == single_camera)
+		if (perspective == ps_3d_single_camera)
 		{
 			temp = ps_3d_subtract_vectors(corners[i], camera);
 			projections[i] = ps_3d_add_vectors(camera, ps_3d_scale_vector(temp, -(camera.z / temp.z)));
 			temp = ps_3d_new_vector(tan(euler_angles.x) * corners[i].z, tan(euler_angles.y) * corners[i].z, corners[i].z / tan(euler_angles.x));
 			projections[i] = ps_3d_add_vectors(projections[i],temp);
 		}
-		else if (perspective == isometric)
+		else if (perspective == ps_3d_isometric)
 		{
 			temp = ps_3d_new_vector(tan(euler_angles.x) * corners[i].z, tan(euler_angles.y)*corners[i].z, corners[i].z / tan(euler_angles.x));
 			projections[i] = ps_3d_add_vectors(corners[i],temp);
@@ -86,7 +86,7 @@ int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color color)
 	fprintf(fp, "gsave fill grestore stroke\n");
 }
 
-int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color)
+static int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color)
 {
 	float zcos = cos(z_rotation), zsin = sin(z_rotation);
 	ps_3d_vector p0,p1,p2,p3,p4,p5,p6,p7;
@@ -161,7 +161,7 @@ int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotat
 	return 0;
 }
 
-ps_3d_obj* ps_3d_sort_queue(ps_3d_obj* head,int length)
+static ps_3d_obj* ps_3d_sort_queue(ps_3d_obj* head,int length)
 {
 	if (head == NULL || head->next == NULL) return head;
 	if (length == 0) return NULL;
