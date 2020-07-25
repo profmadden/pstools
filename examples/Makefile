@@ -33,12 +33,5 @@ example05.pdf: example05
 	gs -o example05.pdf -sDEVICE=pdfwrite -dEPSCrop example05.ps
 
 example05: example05.c ../pstool.c
-	cc example05.c ../pstool.c ../pstools3d.c -o example05 -lm
-	
-example06.pdf: example06
-	./example06
-	gs -o example06.pdf -sDEVICE=pdfwrite -dEPSCrop example06.ps
-
-example06: example06.c ../pstool.c
-	cc example06.c ../pstool.c ../pstools3d.c -o example06 -lm
+	cc example05.c ../pstool.c ../pstool3d.c -o example05 -lm
 

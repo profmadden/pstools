@@ -63,6 +63,8 @@ typedef struct ps_3d_object {
 	struct ps_3d_object* next;
 } ps_3d_obj;
 
+typedef enum { isometric, single_camera } ps_3d_perspective;
+
 ps_3d_vector ps_3d_new_vector(float x, float y, float z);
 ps_3d_vector ps_3d_add_vectors(ps_3d_vector first, ps_3d_vector second);
 ps_3d_vector ps_3d_scale_vector(ps_3d_vector first, float scale);
@@ -70,6 +72,6 @@ ps_3d_color ps_3d_new_color(float r, float g, float b);
 int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4], ps_3d_color color);
 int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
 int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
-int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos);
+int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos, ps_3d_perspective pers, ps_3d_vector angles);
 
 #endif /* pstool_h */
