@@ -69,12 +69,10 @@ static int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color co
 		{
 			temp = ps_3d_subtract_vectors(corners[i], camera);
 			projections[i] = ps_3d_add_vectors(camera, ps_3d_scale_vector(temp, -(camera.z / temp.z)));
-			temp = ps_3d_new_vector(tan(euler_angles.x) * corners[i].z, tan(euler_angles.y) * corners[i].z, corners[i].z / tan(euler_angles.x));
-			projections[i] = ps_3d_add_vectors(projections[i],temp);
 		}
 		else if (perspective == ps_3d_isometric)
 		{
-			temp = ps_3d_new_vector(tan(euler_angles.x) * corners[i].z, tan(euler_angles.y)*corners[i].z, corners[i].z / tan(euler_angles.x));
+			temp = ps_3d_new_vector(tan(euler_angles.x) * corners[i].z, tan(euler_angles.y)*corners[i].z, 0);
 			projections[i] = ps_3d_add_vectors(corners[i],temp);
 		}
 	}
@@ -84,6 +82,7 @@ static int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color co
 		fprintf(fp, "%f %f lineto ", projections[i].x, projections[i].y);
 	}
 	fprintf(fp, "gsave fill grestore stroke\n");
+	return 0;
 }
 
 static int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color)
@@ -194,7 +193,11 @@ static ps_3d_obj* ps_3d_sort_queue(ps_3d_obj* head,int length)
 			cursor = cursor->next;
 			break;
 		}
-		else if (right->pos.y > left->pos.y)
+		else if (
+			(right->pos.y >= left->pos.y) &&
+			!((right->pos.y == left->pos.y) && (right->pos.z > left->pos.z))&&
+			!((right->pos.y == left->pos.y) && (right->pos.x > left->pos.x))
+			)
 		{
 			cursor->next = left;
 			left = left->next;
@@ -224,5 +227,6 @@ int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos,ps_3d_perspective pers, p
 		free(queue);
 		queue = queue->next;
 	}
+	queue_length = 0;
 	return 0;
 }
