@@ -27,7 +27,7 @@ typedef struct
 typedef struct
 {
 	float min, max;
-	int count,precision;
+	int count, precision;
 } ps_scale;
 
 int ps_init(FILE *fp, float originx, float originy, float width, float height);
@@ -43,5 +43,33 @@ int ps_graphpoints(FILE *fp, int nv, float *x, float *y, float *z, int ne, int *
 int ps_finish(FILE *fp);
 int ps_pie_chart(FILE* fp, float originx, float originy, float width, float height, int num_values, float* values, char** labels);
 int ps_histogram(FILE* fp, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float*bar_heights);
+
+//3d stuff
+
+typedef struct
+{
+	float x, y, z;
+} ps_3d_vector;
+
+typedef struct
+{
+	float r, g, b;
+}  * ps_3d_color;
+
+typedef struct ps_3d_object {
+	ps_3d_vector pos,size;
+	float z_rotation;
+	ps_3d_color color;
+	struct ps_3d_object* next;
+} ps_3d_obj;
+
+typedef enum { ps_3d_isometric, ps_3d_single_camera } ps_3d_perspective;
+
+ps_3d_vector ps_3d_new_vector(float x, float y, float z);
+ps_3d_vector ps_3d_add_vectors(ps_3d_vector first, ps_3d_vector second);
+ps_3d_vector ps_3d_scale_vector(ps_3d_vector first, float scale);
+ps_3d_color ps_3d_new_color(float r, float g, float b);
+int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
+int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos, ps_3d_perspective pers, ps_3d_vector angles);
 
 #endif /* pstool_h */
