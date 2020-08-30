@@ -1,4 +1,4 @@
-demos:  example01.pdf example02.pdf example03.pdf example04.pdf
+demos:  example01.pdf example02.pdf example03.pdf example04.pdf example05.pdf example06.pdf 
 
 example01.pdf: example01
 	./example01
@@ -34,4 +34,11 @@ example05.pdf: example05
 
 example05: example05.c ../pstool.c
 	cc example05.c ../pstool.c ../pstool3d.c -o example05 -lm
+
+example06.pdf: example06
+	./example06
+	gs -o example06.pdf -sDEVICE=pdfwrite -dEPSCrop example06.ps
+
+example06: example06.c ../pstool.c
+	cc example06.c ../pstool.c ../pstoolcirc.c -o example06 -lm
 

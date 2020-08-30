@@ -72,4 +72,12 @@ ps_3d_color ps_3d_new_color(float r, float g, float b);
 int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
 int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos, ps_3d_perspective pers, ps_3d_vector angles);
 
+//circuit stuff
+
+int ps_circ_diode(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_zener_diode(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_resistor(FILE* fp, float x1, float y1, float x2, float y2);
+int ps_circ_transistor(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_capacitor(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
+
 #endif /* pstool_h */
