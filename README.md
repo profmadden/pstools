@@ -13,17 +13,18 @@ For writing raw PostScript, here's some good references:
 * [PostScript Tutorial and Cookbook](https://www-cdf.fnal.gov/offline/PostScript/BLUEBOOK.PDF) - the big guide
 
 
-Open a file, and call **ps_init** to generate the boilerplate
-PostScript, that should be at the front of a file.  This will create
+Call **ps_init** to open a file and generate the boilerplate
+PostScript, that should be at the front.  This will create
 a virtual drawing surface, with an XY origin, and a width and height.
 
 ```
-int ps_init(FILE *fp, float originx, float originy, float width, float height);
+ps_context *context = ps_init("filename.ps", float originx, float originy, float width, float height);
 ```
 
 Then, call the various **ps** routines with your C code, to create lines,
-circles, text, and so on.  After you're done, call **ps_finish** and
-close the file.
+circles, text, and so on.  After you're done, call **ps_finish** which
+will generate the terminating boilerplate for the PostScript, and 
+closes the file.
 
 This should create a PostScript file that you can then view with Adobe
 Acrobat, convert to encapsulated PostScript with gs, and so on.  We
