@@ -8,14 +8,25 @@
 
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 #include "pstool.h"
-
-#define pi 3.14159265358979323846
 
 float ps_fontsize;
 
-int ps_init(FILE* fp, float originx, float originy, float width, float height)
+ps_context *ps_init(char *fn, float originx, float originy, float width, float height)
 {
+    FILE *fp = fopen(fn, "w");
+    if (fp == NULL)
+        return NULL;
+    
+    ps_context *context = (ps_context *)malloc(sizeof(ps_context));
+    if (context == NULL)
+    {
+        fclose(fp);
+        return NULL;
+    }
+    
+    context->fp = fp;
 	fprintf(fp, "%%!PS-Adobe-3.0 EPSF-3.0\n");
 	fprintf(fp, "%%%%DocumentData: Clean7Bit\n");
 	fprintf(fp, "%%%\%Origin: %10.2f %10.2f\n", originx, originy);
@@ -27,225 +38,207 @@ int ps_init(FILE* fp, float originx, float originy, float width, float height)
 	fprintf(fp, "/Courier findfont 15 scalefont setfont\n");
 	ps_fontsize = 15;
 
-	return 0;
+	return context;
 }
 
 
-int ps_setlinewidth(FILE* fp, float width)
+int ps_setlinewidth(ps_context *context, float width)
 {
-	fprintf(fp, "%f setlinewidth\n",
+	fprintf(context->fp, "%f setlinewidth\n",
 		width);
 	return 0;
 }
 
-int ps_setcolor(FILE* fp, float r, float g, float b)
+int ps_setcolor(ps_context *context, float r, float g, float b)
 {
-	fprintf(fp, "%3.2f %3.2f %3.2f setrgbcolor\n",
+	fprintf(context->fp, "%3.2f %3.2f %3.2f setrgbcolor\n",
 		r, g, b);
 	return 0;
 }
 
-int ps_setfont(FILE* fp, char* name, float fontsize)
+int ps_setfont(ps_context *context, char* name, float fontsize)
 {
 	if (name == NULL)
 		name = "Courier";
 
-	fprintf(fp, "/%s findfont %f scalefont setfont\n", name, fontsize);
+	fprintf(context->fp, "/%s findfont %f scalefont setfont\n", name, fontsize);
 	ps_fontsize = fontsize;
 	return 0;
 }
 
-int ps_line(FILE* fp, float x1, float y1, float x2, float y2)
+int ps_line(ps_context *context, float x1, float y1, float x2, float y2)
 {
-	fprintf(fp, "newpath %f %f moveto %f %f lineto stroke\n",
+	fprintf(context->fp, "newpath %f %f moveto %f %f lineto stroke\n",
 		x1, y1, x2, y2);
 	return 0;
 }
 
-int ps_note(FILE* fp, char* note)
+int ps_note(ps_context *context, char* note)
 {
-	fprintf(fp, "%% %s\n", note);
+	fprintf(context->fp, "%% %s\n", note);
 	return 0;
 }
 
-int ps_box(FILE* fp, float x1, float y1, float x2, float y2, int stroke, int fill)
+int ps_box(ps_context *context, float x1, float y1, float x2, float y2, int stroke, int fill)
 {
-	fprintf(fp, "newpath %f %f moveto ", x1, y1);
-	fprintf(fp, "%f %f lineto ", x2, y1);
-	fprintf(fp, "%f %f lineto ", x2, y2);
-	fprintf(fp, "%f %f lineto ", x1, y2);
-	fprintf(fp, "%f %f lineto ", x1, y1);
+	fprintf(context->fp, "newpath %f %f moveto ", x1, y1);
+	fprintf(context->fp, "%f %f lineto ", x2, y1);
+	fprintf(context->fp, "%f %f lineto ", x2, y2);
+	fprintf(context->fp, "%f %f lineto ", x1, y2);
+	fprintf(context->fp, "%f %f lineto ", x1, y1);
 	if (fill)
 	{
 		if (stroke)
-			fprintf(fp, "closepath gsave fill grestore stroke\n");
+			fprintf(context->fp, "closepath gsave fill grestore stroke\n");
 		else
-			fprintf(fp, "closepath fill\n");
+			fprintf(context->fp, "closepath fill\n");
 	}
 	else
 	{
 		if (stroke)
-			fprintf(fp, "closepath stroke\n");
+			fprintf(context->fp, "closepath stroke\n");
 	}
 	return 0;
 }
 
-int ps_circle(FILE* fp, float cx, float cy, float radius, int stroke, int fill)
+int ps_circle(ps_context *context, float cx, float cy, float radius, int stroke, int fill)
 {
-	fprintf(fp, "%f %f %f 0 360 arc closepath\n",
+	fprintf(context->fp, "%f %f %f 0 360 arc closepath\n",
 		cx, cy, radius);
 	if (fill)
 	{
 		if (stroke)
-			fprintf(fp, "gsave fill grestore stroke\n");
+			fprintf(context->fp, "gsave fill grestore stroke\n");
 		else
-			fprintf(fp, "fill\n");
+			fprintf(context->fp, "fill\n");
 	}
 	else
 	{
 		if (stroke)
-			fprintf(fp, "stroke\n");
+			fprintf(context->fp, "stroke\n");
 	}
 	return 0;
 }
 
-int ps_text(FILE* fp, float x, float y, char* text)
+int ps_text(ps_context *context, float x, float y, char* text)
 {
-	fprintf(fp, "%f %f moveto (%s) show\n", x, y, text);
+	fprintf(context->fp, "%f %f moveto (%s) show\n", x, y, text);
 	return 0;
 }
 
 // Curved lines:
 // newpath 20 20 moveto 60 60 lineto 100 150 110 320 180 400 curveto stroke
 
-int ps_graphpoints(FILE* fp, int nv, float* x, float* y, float* z, int ne, int* v0, int* v1, float zscale)
+int ps_graphpoints(ps_context *context, int nv, float* x, float* y, float* z, int ne, int* v0, int* v1, float zscale)
 {
 	for (int e = 0; e < ne; ++e)
 	{
-		ps_line(fp, x[v0[e]], y[v0[e]], x[v1[e]], y[v1[e]]);
+		ps_line(context, x[v0[e]], y[v0[e]], x[v1[e]], y[v1[e]]);
 	}
 	for (int v = 0; v < nv; ++v)
 	{
-		ps_circle(fp, x[v], y[v], 10, 1, 1);
+		ps_circle(context, x[v], y[v], 10, 1, 1);
 	}
 
 	return 0;
 }
 
-struct graphexample
-{
-	float originx;
-	float originy;
-	float width;
-	float height;
-	float intervalx; //intervals are how far to space gridlines/ticks on each axis
-	float intervaly;
-};
 
-//values of min and max x and y's -- helpful for determining scale on graph for grid lines and plotting points accurately 6 
-struct graphminsmaxs
-{
-	float min_x;
-	float max_x;
-	float min_y;
-	float max_y;
-};
-
-int ps_graph_box(FILE* fp, struct graphexample graph, struct graphminsmaxs values)
+int ps_graph_box(ps_context *context, struct graphexample graph, struct graphminsmaxs values)
 {
 
 	float scalex = graph.width / values.max_x;
 	float scaley = graph.height / values.max_y;
 
-	ps_line(fp, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
-	ps_line(fp, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
+	ps_line(context, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
+	ps_line(context, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
 
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
 
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
 
 	//draws vertical tick lines
 	for (int i = graph.originx; i <= graph.originx + graph.width; i += (graph.intervalx * scalex))
 	{
-		ps_line(fp, i, graph.originy - 2, i, graph.originy);
+		ps_line(context, i, graph.originy - 2, i, graph.originy);
 	}
 
 	//draws horizontal tick lines
 	for (int i = graph.originy; i <= graph.originy + graph.height; i += (graph.intervaly * scaley))
 	{
-		ps_line(fp, graph.originx - 2, i, graph.originx, i);
+		ps_line(context, graph.originx - 2, i, graph.originx, i);
 	}
 
 	return 0;
 }
 
-int ps_graph_box_grid(FILE* fp, struct graphexample graph, struct graphminsmaxs values)
+int ps_graph_box_grid(ps_context *context, struct graphexample graph, struct graphminsmaxs values)
 {
 
 	float scalex = graph.width / values.max_x;
 	float scaley = graph.height / values.max_y;
 
-	ps_line(fp, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
-	ps_line(fp, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
+	ps_line(context, graph.originx, graph.originy, graph.originx + graph.width, graph.originy);
+	ps_line(context, graph.originx, graph.originy, graph.originx, graph.originy + graph.height);
 
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx, graph.originy - 12, values.min_x);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy, values.min_y);
 
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
-	fprintf(fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx + graph.width, graph.originy - 12, values.max_x);
+	fprintf(context->fp, "%f %f moveto (%.1f) show\n", graph.originx - 35, graph.originy + graph.height, values.max_y);
 
 	//draws vertical grid lines
 	for (int i = graph.originx; i <= graph.originx + graph.width; i += (graph.intervalx * scalex))
 	{
-		ps_line(fp, i, graph.originy - 2, i, graph.originy + graph.height);
+		ps_line(context, i, graph.originy - 2, i, graph.originy + graph.height);
 	}
 
 	//draws horizontal grid lines
 	for (int i = graph.originy; i <= graph.originy + graph.height; i += (graph.intervaly * scaley))
 	{
-		ps_line(fp, graph.originx - 2, i, graph.originx + graph.width, i);
+		ps_line(context, graph.originx - 2, i, graph.originx + graph.width, i);
 	}
 
 	return 0;
 }
 
-int ps_graph_line(FILE* fp, struct graphexample graph, int num_values, float* x, float* y, struct graphminsmaxs values)
+int ps_graph_line(ps_context *context, struct graphexample graph, int num_values, float* x, float* y, struct graphminsmaxs values)
 {
 	float scalex = graph.width / values.max_x;
 	float scaley = graph.height / values.max_y;
 	for (int i = 0; i < num_values; i++)
 	{
-		ps_circle(fp, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), 2, 1, 1);
+		ps_circle(context, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), 2, 1, 1);
 		if (i < num_values - 1) {
-			ps_line(fp, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), graph.originx + (x[i + 1] * scalex), graph.originy + (y[i + 1] * scaley));
+			ps_line(context, graph.originx + (x[i] * scalex), graph.originy + (y[i] * scaley), graph.originx + (x[i + 1] * scalex), graph.originy + (y[i + 1] * scaley));
 		}
 	}
 
 	return 0;
 }
 
-int ps_pie_chart(FILE* fp, float originx, float originy, float width, float height, int num_values, float* values, char** labels)
+int ps_pie_chart(ps_context *context, float originx, float originy, float width, float height, int num_values, float* values, char** labels)
 {
 	float radius = width / 2;
-	ps_circle(fp, originx, originy, radius, 1, 0);
+	ps_circle(context, originx, originy, radius, 1, 0);
 	int i;
 	float targetx, targety, angle = 0;
 	for (i = 0; i < num_values; i++) //for lines
 	{
 		targetx = originx + cos(angle) * radius;
 		targety = originy + sin(angle) * radius;
-		ps_line(fp, originx, originy, targetx, targety);
-		angle += 2.0F * pi * values[i];
+		ps_line(context, originx, originy, targetx, targety);
+		angle += 2.0F * M_PI * values[i];
 	}
 	angle = 0;
 	for (i = 0; i < num_values; i++) //for labels
 	{
-		angle += pi * (values[i] + (i > 0 ? values[i - 1] : 0.0F));
+		angle += M_PI * (values[i] + (i > 0 ? values[i - 1] : 0.0F));
 		targetx = originx + cos(angle) * radius;
 		targety = originy + sin(angle) * radius;
-		ps_text(fp, 
+		ps_text(context,
 			(targetx * 2 + originx) / 3 - ((ps_fontsize/3) * strlen(labels[i])),
 			(targety * 2 + originy) / 3 - (ps_fontsize / 3),
 			labels[i]);
@@ -254,12 +247,12 @@ int ps_pie_chart(FILE* fp, float originx, float originy, float width, float heig
 }
 
 
-int ps_histogram(FILE* fp, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float* bar_heights)
+int ps_histogram(ps_context *context, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float* bar_heights)
 {
-	ps_line(fp, originx,originy, originx + width,originy); //initial lines and labels
-	ps_line(fp, originx,originy,originx, originy + height);
-	ps_text(fp, originx + width, originy, x_label);
-	ps_text(fp, originx, originy+height, y_label);
+	ps_line(context, originx,originy, originx + width,originy); //initial lines and labels
+	ps_line(context, originx,originy,originx, originy + height);
+	ps_text(context, originx + width, originy, x_label);
+	ps_text(context, originx, originy+height, y_label);
 
 	int i;
 	float value_scale = (x_scale.max - x_scale.min) / x_scale.count;
@@ -269,9 +262,9 @@ int ps_histogram(FILE* fp, float originx, float originy, float width, float heig
 	for (i = 0; i < x_scale.count+1; i++) //x axis values
 	{
 		snprintf(label_buffer_x, sizeof(label_buffer_x), "%f", x_scale.min + value_scale * i);
-		ps_text(fp, originx + scale * i, originy - ps_fontsize , label_buffer_x);
+		ps_text(context, originx + scale * i, originy - ps_fontsize , label_buffer_x);
 		if (i < x_scale.count)
-			ps_box(fp,
+			ps_box(context,
 				originx + (scale * i),
 				originy,
 				originx + (scale * (i+1)),
@@ -287,14 +280,18 @@ int ps_histogram(FILE* fp, float originx, float originy, float width, float heig
 	for (i = 0; i < y_scale.count+1; i++) //y axis values
 	{
 		snprintf(label_buffer_y, sizeof(label_buffer_y), "%f", y_scale.min + value_scale * i);
-		ps_text(fp, originx - (ps_fontsize * (((float)sizeof(label_buffer_y))/2)) , originy + scale * i,  label_buffer_y);
+		ps_text(context, originx - (ps_fontsize * (((float)sizeof(label_buffer_y))/2)) , originy + scale * i,  label_buffer_y);
 	}
 
 	return 0;
 }
 
-int ps_finish(FILE* fp)
+int ps_finish(ps_context *context)
 {
-	fprintf(fp, "%%%%EOF\n");
+	fprintf(context->fp, "%%%%EOF\n");
+    fclose(context->fp);
+    
+    free(context);
+
 	return 0;
 }

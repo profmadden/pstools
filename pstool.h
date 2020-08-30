@@ -11,12 +11,26 @@
 
 #include <stdio.h>
 
-typedef struct
+
+
+
+struct graphexample
 {
-  FILE *fp;
-  // Entire drawing region for the PostScript file
-  float origin_x, origin_y, width, height;
-} ps_context;
+    float originx;
+    float originy;
+    float width;
+    float height;
+    float intervalx; //intervals are how far to space gridlines/ticks on each axis
+    float intervaly;
+};
+
+struct graphminsmaxs
+{
+    float min_x;
+    float max_x;
+    float min_y;
+    float max_y;
+};
 
 typedef struct
 {
@@ -26,24 +40,40 @@ typedef struct
 
 typedef struct
 {
-	float min, max;
-	int count, precision;
+    float min, max;
+    int count, precision;
 } ps_scale;
 
-int ps_init(FILE *fp, float originx, float originy, float width, float height);
-int ps_setlinewidth(FILE *fp, float width);
-int ps_setcolor(FILE *fp, float r, float g, float b);
-int ps_setfont(FILE *fp, char *name, float fontsize);
-int ps_line(FILE *fp, float x1, float y1, float x2, float y2);
-int ps_note(FILE *fp, char *note);
-int ps_box(FILE *fp, float x1, float y1, float x2, float y2, int stroke, int fill);
-int ps_circle(FILE *fp, float cx, float cy, float radius, int stroke, int fill);
-int ps_text(FILE *fp, float x, float y, char *text);
-int ps_graphpoints(FILE *fp, int nv, float *x, float *y, float *z, int ne, int *v0, int *v1, float zscale);
-int ps_finish(FILE *fp);
-int ps_pie_chart(FILE* fp, float originx, float originy, float width, float height, int num_values, float* values, char** labels);
-int ps_histogram(FILE* fp, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float*bar_heights);
 
+typedef struct
+{
+  FILE *fp;
+  // Entire drawing region for the PostScript file
+  float origin_x, origin_y, width, height;
+} ps_context;
+
+
+ps_context *ps_init(char *fn, float originx, float originy, float width, float height);
+int ps_finish(ps_context *context);
+int ps_setlinewidth(ps_context *context, float width);
+int ps_setcolor(ps_context *context, float r, float g, float b);
+int ps_setfont(ps_context *context, char *name, float fontsize);
+int ps_line(ps_context *context, float x1, float y1, float x2, float y2);
+int ps_note(ps_context *context, char *note);
+int ps_box(ps_context *context, float x1, float y1, float x2, float y2, int stroke, int fill);
+int ps_circle(ps_context *context, float cx, float cy, float radius, int stroke, int fill);
+int ps_text(ps_context *context, float x, float y, char *text);
+int ps_graphpoints(ps_context *context, int nv, float *x, float *y, float *z, int ne, int *v0, int *v1, float zscale);
+
+int ps_pie_chart(ps_context *context, float originx, float originy, float width, float height, int num_values, float* values, char** labels);
+int ps_histogram(ps_context *context, float originx, float originy, float width, float height, char* x_label, char* y_label, ps_scale x_scale, ps_scale y_scale, float*bar_heights);
+
+
+int ps_graph_box(ps_context *context, struct graphexample graph, struct graphminsmaxs vals);
+
+int ps_graph_box_grid(ps_context *context, struct graphexample graph, struct graphminsmaxs vals);
+
+int ps_graph_line(ps_context *context, struct graphexample graph, int num_values, float *x, float *y, struct graphminsmaxs vals);
 //3d stuff
 
 typedef struct
@@ -70,14 +100,14 @@ ps_3d_vector ps_3d_add_vectors(ps_3d_vector first, ps_3d_vector second);
 ps_3d_vector ps_3d_scale_vector(ps_3d_vector first, float scale);
 ps_3d_color ps_3d_new_color(float r, float g, float b);
 int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color);
-int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos, ps_3d_perspective pers, ps_3d_vector angles);
+int ps_3d_draw_scene(ps_context *context, ps_3d_vector camera_pos, ps_3d_perspective pers, ps_3d_vector angles);
 
 //circuit stuff
 
-int ps_circ_diode(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
-int ps_circ_zener_diode(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
-int ps_circ_resistor(FILE* fp, float x1, float y1, float x2, float y2);
-int ps_circ_transistor(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
-int ps_circ_capacitor(FILE* fp, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_diode(ps_context *context, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_zener_diode(ps_context *context, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_resistor(ps_context *context, float x1, float y1, float x2, float y2);
+int ps_circ_transistor(ps_context *context, float x1, float y1, float x2, float y2, int isVertical);
+int ps_circ_capacitor(ps_context *context, float x1, float y1, float x2, float y2, int isVertical);
 
 #endif /* pstool_h */

@@ -121,9 +121,8 @@ int main(int argc, char *argv[])
   perp_point(0, 0, 100, 100, 5, &x, &y);
 
 
-    FILE *fp = fopen("example02.ps", "w");
-    
-    ps_init(fp, 0, 0, 1000, 1000);
+    // FILE *fp = fopen("example02.ps", "w");
+    ps_context *context = ps_init("example02.ps", 0, 0, 1000, 1000);
 
 
 
@@ -140,7 +139,7 @@ int main(int argc, char *argv[])
 		ps_solspace(j, bits, 100, 100, 900, 900, &x1, &y1);
 		perp_point(x0, y0, x1, y1, 80, &midx, &midy);
 		//ps_line(fp, x0 + i, y0 + i, x1 + j, y1 + j);
-		fprintf(fp, "%f %f moveto %f %f %f %f %f %f curveto stroke\n",
+		fprintf(context->fp, "%f %f moveto %f %f %f %f %f %f curveto stroke\n",
 		       x0, y0, x0, y0, midx, midy, x1, y1);
 	      }
 	  }
@@ -150,13 +149,13 @@ int main(int argc, char *argv[])
     for (int i = 0; i < (1 << bits); ++i)
       {
 	ps_solspace(i, bits, 100, 100, 900, 900, &x, &y);
-	ps_circle(fp, x, y, 3, 0, 1);
+	ps_circle(context, x, y, 3, 0, 1);
       }
 
 
-    ps_finish(fp);
+    ps_finish(context);
     
-    fclose(fp);
+    // fclose(fp);
 
     return 0;
 }

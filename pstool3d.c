@@ -57,9 +57,9 @@ int ps_3d_new_box(ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_c
 //draw operations
 
 
-static int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color color)
+static int ps_3d_draw_rectangle(ps_context *context, ps_3d_vector corners[4],ps_3d_color color)
 {
-	ps_setcolor(fp, color->r, color->g, color->b);
+	ps_setcolor(context, color->r, color->g, color->b);
 	ps_3d_vector temp, projections[4];
 	int i;
 
@@ -76,16 +76,16 @@ static int ps_3d_draw_rectangle(FILE* fp, ps_3d_vector corners[4],ps_3d_color co
 			projections[i] = ps_3d_add_vectors(corners[i],temp);
 		}
 	}
-	fprintf(fp, "newpath %f %f moveto ", projections[3].x, projections[3].y);
+	fprintf(context->fp, "newpath %f %f moveto ", projections[3].x, projections[3].y);
 	for (i = 0; i < 4; i++)
 	{
-		fprintf(fp, "%f %f lineto ", projections[i].x, projections[i].y);
+		fprintf(context->fp, "%f %f lineto ", projections[i].x, projections[i].y);
 	}
-	fprintf(fp, "gsave fill grestore stroke\n");
+	fprintf(context->fp, "gsave fill grestore stroke\n");
 	return 0;
 }
 
-static int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color)
+static int ps_3d_draw_cube(ps_context *context, ps_3d_vector pos, ps_3d_vector size, float z_rotation, ps_3d_color color)
 {
 	float zcos = cos(z_rotation), zsin = sin(z_rotation);
 	ps_3d_vector p0,p1,p2,p3,p4,p5,p6,p7;
@@ -135,26 +135,26 @@ static int ps_3d_draw_cube(FILE* fp, ps_3d_vector pos, ps_3d_vector size, float 
 
 	color->r -= 0.1, color->g -= 0.1, color->b -= 0.1;
 	ps_3d_vector cornersE[4] = { p7, p0, p2, p6 };
-	ps_3d_draw_rectangle(fp, cornersE, color);
+	ps_3d_draw_rectangle(context, cornersE, color);
 	color->r += 0.1, color->g += 0.1, color->b += 0.1;
 
 	ps_3d_vector cornersA[4] = { p1, p0, p2, p3 };
-	ps_3d_draw_rectangle(fp, cornersA, color);
+	ps_3d_draw_rectangle(context, cornersA, color);
 
 	ps_3d_vector cornersB[4] = { p1, p3 ,p5 ,p4 };
-	ps_3d_draw_rectangle(fp, cornersB, color);
+	ps_3d_draw_rectangle(context, cornersB, color);
 
 	ps_3d_vector cornersC[4] = { p6, p5 ,p3, p2 };
-	ps_3d_draw_rectangle(fp, cornersC, color);
+	ps_3d_draw_rectangle(context, cornersC, color);
 
 	color->r += 0.15, color->g += 0.15, color->b += 0.15;
 	ps_3d_vector cornersD[4] = { p7, p4, p5 ,p6 };
-	ps_3d_draw_rectangle(fp, cornersD, color);
+	ps_3d_draw_rectangle(context, cornersD, color);
 	color->r -= 0.15, color->g -= 0.15, color->b -= 0.15;
 
 	color->r += 0.1, color->g += 0.1, color->b += 0.1;
 	ps_3d_vector cornersF[4] = { p0, p1, p4, p7 };
-	ps_3d_draw_rectangle(fp, cornersF, color);
+	ps_3d_draw_rectangle(context, cornersF, color);
 	color->r -= 0.1, color->g -= 0.1, color->b -= 0.1;
 
 	return 0;
@@ -215,7 +215,7 @@ static ps_3d_obj* ps_3d_sort_queue(ps_3d_obj* head,int length)
 	return returnPtr->next;
 }
 
-int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos,ps_3d_perspective pers, ps_3d_vector angles)
+int ps_3d_draw_scene(ps_context *context, ps_3d_vector camera_pos,ps_3d_perspective pers, ps_3d_vector angles)
 {
 	perspective = pers;
 	euler_angles = angles;
@@ -223,7 +223,7 @@ int ps_3d_draw_scene(FILE* fp, ps_3d_vector camera_pos,ps_3d_perspective pers, p
 	queue = ps_3d_sort_queue(queue, queue_length);
 	while (queue)
 	{
-		ps_3d_draw_cube(fp, queue->pos, queue->size, queue->z_rotation, queue->color);
+		ps_3d_draw_cube(context, queue->pos, queue->size, queue->z_rotation, queue->color);
 		free(queue);
 		queue = queue->next;
 	}

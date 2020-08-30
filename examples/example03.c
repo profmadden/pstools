@@ -2,38 +2,14 @@
 #include <math.h>
 #include "../pstool.h"
 
-struct graphexample
-{
-    float originx;
-    float originy;
-    float width;
-    float height;
-    float intervalx; //intervals are how far to space gridlines/ticks on each axis
-    float intervaly;
-};
 
-struct graphminsmaxs
-{
-    float min_x;
-    float max_x;
-    float min_y;
-    float max_y;
-};
+#if 0
 
-int ps_pie_chart(FILE *fp, float originx, float originy, float width, float height, int num_values, float *values, char **labels);
-
-int ps_graph_box(FILE *fp, struct graphexample graph, struct graphminsmaxs vals);
-
-int ps_graph_box_grid(FILE *fp, struct graphexample graph, struct graphminsmaxs vals);
-
-int ps_graph_line(FILE *fp, struct graphexample graph, int num_values, float *x, float *y, struct graphminsmaxs vals);
-
+#endif
 
 int main(int argc, char *argv[])
 {
-    FILE *fp = fopen("example03.ps", "w");
-    
-    ps_init(fp, 0, 0, 1000, 1000);
+    ps_context * context = ps_init("example03.ps", 0, 0, 1000, 1000);
     // ps_graphpoints(fp, 5, x, y, z, 5, v0, v1, 0.0);
     
     struct graphexample boxgrid;
@@ -58,17 +34,15 @@ int main(int argc, char *argv[])
     range.min_y = 0;
     range.max_y = 30;
     
-    ps_graph_box_grid(fp, boxgrid, range);
+    ps_graph_box_grid(context, boxgrid, range);
    // ps_graph_box(fp, 700, 650, 200, 200, 0, 100, 0, 200, 10, 20);
-    ps_graph_box(fp, g, range);
+    ps_graph_box(context, g, range);
     
     float x[5] = {0, 5, 15, 20, 40};
     float y[5] = {0, 10, 15, 25, 30};
-    ps_graph_line(fp, boxgrid, 5, x, y, range);
-    ps_graph_line(fp, g, 5, x, y, range);
-    ps_finish(fp);
+    ps_graph_line(context, boxgrid, 5, x, y, range);
+    ps_graph_line(context, g, 5, x, y, range);
+    ps_finish(context);
     
-    fclose(fp);
-
     return 0;
 }

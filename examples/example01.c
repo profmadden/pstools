@@ -12,15 +12,7 @@
 #include <math.h>
 #include "../pstool.h"
 
-float x[] = {0, 33, 404, 571, 18};
-float y[] = {200, 93, 59, 843, 197};
-float z[] = {300, 143, 804, 271, 438};
-
-int v0[] = {0, 1, 2, 3, 4};
-int v1[] = {3, 2, 1, 4, 3};
-
-
-int ps_solspace(FILE *fp, int n, int llx, int lly, int width, int bend)
+int ps_solspace(ps_context *context, int n, int llx, int lly, int width, int bend)
 {
     int bits = ((int)log2(n)) + 1;
     float vi[2], vj[2];
@@ -47,7 +39,7 @@ int ps_solspace(FILE *fp, int n, int llx, int lly, int width, int bend)
                 
                 int dist = j - i;
                 
-                fprintf(fp, "%f %f moveto %f %f %f %f %f %f curveto stroke\n",
+                fprintf(context->fp, "%f %f moveto %f %f %f %f %f %f curveto stroke\n",
                         vi[0], vi[1],
                         vi[0], vi[1],
                         (vi[0] + vj[0])/2, vi[1] + bend*dist,
@@ -60,7 +52,7 @@ int ps_solspace(FILE *fp, int n, int llx, int lly, int width, int bend)
     {
         float x = llx + (((float) i/n) * width);
         float y = lly;
-        ps_circle(fp, x, y, bend/6.0, 0, 1);
+        ps_circle(context, x, y, bend/6.0, 0, 1);
     }
     
     //printf("%d edges\n", edgecount);
@@ -91,7 +83,7 @@ void ps_tree_pos(int llx, int lly, int width, int height,
     *y = lly + (float)level/levels * height;
 }
 
-int ps_soltree(FILE *fp, int n, int llx, int lly, int width, int height)
+int ps_soltree(ps_context *context, int n, int llx, int lly, int width, int height)
 {
     int branches = 2;
     int levels = ((int)log2(n));
@@ -109,7 +101,7 @@ int ps_soltree(FILE *fp, int n, int llx, int lly, int width, int height)
             ps_tree_pos(llx, lly, width, height, level, levels,
                         b, &x2, &y2);
             
-            ps_line(fp, x1, y1, x2, y2);
+            ps_line(context, x1, y1, x2, y2);
         }
         ++level;
         branches = branches * 2;
@@ -121,17 +113,13 @@ int ps_soltree(FILE *fp, int n, int llx, int lly, int width, int height)
 
 int main(int argc, char *argv[])
 {
-    FILE *fp = fopen("example01.ps", "w");
-    
-    ps_init(fp, 0, 0, 1000, 1000);
+    ps_context *context = ps_init("example01.ps", 0, 0, 1000, 1000);
     // ps_graphpoints(fp, 5, x, y, z, 5, v0, v1, 0.0);
     
-    ps_soltree( fp, 32, 50, 900, 900, -600);
-    ps_solspace(fp, 32, 50, 300, 900, 25);
+    ps_soltree(context, 32, 50, 900, 900, -600);
+    ps_solspace(context, 32, 50, 300, 900, 25);
 
-    ps_finish(fp);
+    ps_finish(context);
     
-    fclose(fp);
-
     return 0;
 }
