@@ -3,7 +3,7 @@
 
 int main()
 {
-	ps_context *context = ps_init("example05.ps", 0, 0, 3000, 2000);
+	ps_context *context = ps_init("example05.ps", 350, 380, 1900, 1000);
 	ps_setfont(context, "Courier", 30);
 
 	ps_3d_color blue = ps_3d_new_color(0.2, 0.2, 0.9);

@@ -9,22 +9,22 @@
 
 int main(int argc, char *argv[])
 {
-    ps_context * context = ps_init("example03.ps", 0, 0, 1000, 1000);
+    ps_context * context = ps_init("example03.ps", 0, 0, 1000, 520);
     // ps_graphpoints(fp, 5, x, y, z, 5, v0, v1, 0.0);
     
     struct graphexample boxgrid;
-    boxgrid.originx = 700;
-    boxgrid.originy = 650;
-    boxgrid.width = 200;
-    boxgrid.height = 200;
+    boxgrid.originx = 50;
+    boxgrid.originy = 30;
+    boxgrid.width = 400;
+    boxgrid.height = 400;
     boxgrid.intervalx = 10;
     boxgrid.intervaly = 10;
     
     struct graphexample g;
-    g.originx = 400;
-    g.originy = 400;
-    g.width = 100;
-    g.height = 100;
+    g.originx = 550;
+    g.originy = 30;
+    g.width = 400;
+    g.height = 400;
     g.intervalx = 5;
     g.intervaly = 10;
     
