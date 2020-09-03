@@ -40,3 +40,8 @@ so there's no worries if we're running on Mac, Linux, or Windows.  The
 PostScript renders nicely, is generally very compact, and makes it easy
 to capture visuals at different points in the run of a tool.
 
+This software is made available without restriction, for any purpose
+you might wish (but obviously, comes with no warranty or support
+commitment).  It would be cool if you let us know if you use it, and
+maybe mention it if it's in a research paper or something.
+
