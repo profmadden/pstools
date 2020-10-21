@@ -34,7 +34,9 @@ ps_context *ps_init(char *fn, float originx, float originy, float width, float h
 	fprintf(fp, "%%%%LanguageLevel: 2\n");
 	fprintf(fp, "%%%%Pages: 1\n");
 	fprintf(fp, "%%%%Page: 1 1                           \n");
-
+    fprintf(fp, "%% Convert to PDF with something like this:\n");
+    fprintf(fp, "%% gs -o OutputFileName.pdf -sDEVICE=pdfwrite -dEPSCrop InputFileName.ps\n");
+    
 	fprintf(fp, "/Courier findfont 15 scalefont setfont\n");
 	ps_fontsize = 15;
 
