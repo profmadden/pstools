@@ -36,7 +36,14 @@ ps_context *ps_init(char *fn, float originx, float originy, float width, float h
 	fprintf(fp, "%%%%Page: 1 1                           \n");
     fprintf(fp, "%% Convert to PDF with something like this:\n");
     fprintf(fp, "%% gs -o OutputFileName.pdf -sDEVICE=pdfwrite -dEPSCrop InputFileName.ps\n");
-    
+    fprintf(fp, "%% PostScript generated using the PStools library\n");
+    fprintf(fp, "%% from the Binghamton Optimality Research Group\n");
+    fprintf(fp, "%% Get the library at https://github.com/profmadden/pstools\n");
+    fprintf(fp, "%% This library is free to use, however you see fit.  It would be\n");
+    fprintf(fp, "%% nice if you let us know that you're using it, though!\n");
+    fprintf(fp, "%% Drop us an email at pmadden@binghamton.edu, or pop by our\n");
+    fprintf(fp, "%% web page, https://optimal.cs.binghamton.edu\n");
+    fprintf(fp, "%% Standard use-at-your-own-risk stuff applies....\n");
 	fprintf(fp, "/Courier findfont 15 scalefont setfont\n");
 	ps_fontsize = 15;
 
