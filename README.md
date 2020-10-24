@@ -1,6 +1,11 @@
 # pstools
 A simple C wrapper library, for generating PostScript files.
 
+This library was presented at [WOSET2020](https://woset-workshop.github.io/WOSET2020.html#article-8), a Workshop on Open Source EDA Tools
+
+[WOSET Paper (PDF)](https://woset-workshop.github.io/PDFs/2020/a08.pdf)
+[YouTube presentation](https://www.youtube.com/watch?v=fvlCVwuNR3o)
+
 [PostScript](https://www.adobe.com/content/dam/acom/en/devnet/actionscript/articles/PLRM.pdf)
 is a handy language for creating graphics, text, and whatnot.
 Really, some first-rate magic from the good folks at Adobe.  This
